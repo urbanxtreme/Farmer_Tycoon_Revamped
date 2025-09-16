@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seedling Success - Advanced Crop Seed Calculator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(255, 255, 255, 0.03) 10px,
+          rgba(255, 255, 255, 0.03) 20px
+        );
+        animation: slide 20s linear infinite;
+      }
+
+      @keyframes slide {
+        0% {
+          transform: translateX(-50px);
+        }
+        100% {
+          transform: translateX(50px);
+        }
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        padding: 30px;
+      }
+
+      .left-panel,
+      .right-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .left-panel:hover,
+      .right-panel:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title::before {
+        content: "🌱";
+        font-size: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #4caf50;
+        background: white;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        align-items: end;
+      }
+
+      .input-group input {
+        flex: 1;
+      }
+
+      .unit-label {
+        background: #4caf50;
+        color: white;
+        padding: 12px 15px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+      }
+
+      .btn-secondary:hover {
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+      }
+
+      .file-upload {
+        border: 2px dashed #4caf50;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: #f8fff8;
+      }
+
+      .file-upload:hover {
+        border-color: #45a049;
+        background: #f0fff0;
+      }
+
+      .file-upload.dragover {
+        border-color: #2e7d32;
+        background: #e8f8e8;
+        transform: scale(1.02);
+      }
+
+      .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        margin-top: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .results {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 20px;
+        border: 2px solid #e0e0e0;
+      }
+
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .result-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-label {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .result-value {
+        font-size: 1.1rem;
+        color: #4caf50;
+        font-weight: 700;
+      }
+
+      .crop-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        border-left: 4px solid #2196f3;
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 20px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        padding: 5px;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: #666;
+      }
+
+      .tab.active {
+        background: #4caf50;
+        color: white;
+        box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .weather-widget {
+        background: linear-gradient(135deg, #ffe082 0%, #ffd54f 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .cost-calculator {
+        background: linear-gradient(135deg, #f8bbd9 0%, #e1bee7 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50 0%, #45a049 100%);
+        width: 0%;
+        transition: width 1s ease;
+        border-radius: 10px;
+      }
+
+      .planting-calendar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .month-card {
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .month-card.ideal {
+        border-color: #4caf50;
+        background: #f0fff0;
+      }
+
+      .month-card.possible {
+        border-color: #ff9800;
+        background: #fff8f0;
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .input-group {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>🌱 Seedling Success</h1>
+        <p>
+          Advanced Crop Seed Calculator - Harvesting Precision for Modern
+          Agriculture
+        </p>
+      </header>
+
+      <div class="main-content">
+        <div class="left-panel">
+          <h2 class="section-title">Field Configuration</h2>
+
+          <div class="tabs">
+            <div class="tab active" onclick="showTab('basic')">Basic</div>
+            <div class="tab" onclick="showTab('advanced')">Advanced</div>
+            <div class="tab" onclick="showTab('analysis')">Analysis</div>
+          </div>
+
+          <div id="basic-tab" class="tab-content active">
+            <div class="form-group">
+              <label for="cropType">Crop Type:</label>
+              <select id="cropType" onchange="updateCropInfo()">
+                <option value="">Select Crop</option>
+                <option value="wheat">Wheat</option>
+                <option value="corn">Corn</option>
+                <option value="rice">Rice</option>
+                <option value="soybeans">Soybeans</option>
+                <option value="barley">Barley</option>
+                <option value="oats">Oats</option>
+                <option value="sunflower">Sunflower</option>
+                <option value="cotton">Cotton</option>
+                <option value="tomato">Tomato</option>
+                <option value="potato">Potato</option>
+                <option value="carrot">Carrot</option>
+                <option value="lettuce">Lettuce</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="fieldArea">Field Area:</label>
+              <div class="input-group">
+                <input
+                  type="number"
+                  id="fieldArea"
+                  placeholder="Enter area"
+                  step="0.01"
+                  min="0"
+                />
+                <select id="areaUnit" class="unit-label">
+                  <option value="acres">Acres</option>
+                  <option value="hectares">Hectares</option>
+                  <option value="sqft">Sq Feet</option>
+                  <option value="sqm">Sq Meters</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="seedDensity">Seed Density (per sq meter):</label>
+              <input
+                type="number"
+                id="seedDensity"
+                placeholder="Seeds per sq meter"
+                min="1"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="plantingMethod">Planting Method:</label>
+              <select id="plantingMethod">
+                <option value="broadcast">Broadcast Seeding</option>
+                <option value="drill">Drill Seeding</option>
+                <option value="transplant">Transplanting</option>
+                <option value="precision">Precision Planting</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="advanced-tab" class="tab-content">
+            <div class="form-group">
+              <label for="germinationRate">Germination Rate (%):</label>
+              <input
+                type="number"
+                id="germinationRate"
+                placeholder="85"
+                min="1"
+                max="100"
+                value="85"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="survivalRate">Plant Survival Rate (%):</label>
+              <input
+                type="number"
+                id="survivalRate"
+                placeholder="90"
+                min="1"
+                max="100"
+                value="90"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="wasteBuffer">Waste Buffer (%):</label>
+              <input
+                type="number"
+                id="wasteBuffer"
+                placeholder="10"
+                min="0"
+                max="50"
+                value="10"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="rowSpacing">Row Spacing (cm):</label>
+              <input type="number" id="rowSpacing" placeholder="30" min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="plantSpacing">Plant Spacing (cm):</label>
+              <input type="number" id="plantSpacing" placeholder="15" min="1" />
+            </div>
+
+            <div class="cost-calculator">
+              <h3>💰 Cost Calculator</h3>
+              <div class="form-group">
+                <label for="seedPrice">Seed Price (per kg):</label>
+                <input
+                  type="number"
+                  id="seedPrice"
+                  placeholder="0"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+              <div class="form-group">
+                <label for="currency">Currency:</label>
+                <select id="currency">
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="INR">INR (₹)</option>
+                  <option value="CAD">CAD (C$)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="analysis-tab" class="tab-content">
+            <div class="weather-widget">
+              <h3>🌤️ Planting Conditions</h3>
+              <div class="form-group">
+                <label for="soilType">Soil Type:</label>
+                <select id="soilType">
+                  <option value="clay">Clay</option>
+                  <option value="loam">Loam</option>
+                  <option value="sand">Sandy</option>
+                  <option value="silt">Silty</option>
+                  <option value="peat">Peat</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="climate">Climate Zone:</label>
+                <select id="climate">
+                  <option value="temperate">Temperate</option>
+                  <option value="tropical">Tropical</option>
+                  <option value="arid">Arid</option>
+                  <option value="continental">Continental</option>
+                  <option value="mediterranean">Mediterranean</option>
+                </select>
+              </div>
+            </div>
+
+            <div
+              class="file-upload"
+              onclick="document.getElementById('fieldImage').click()"
+            >
+              <div>📸 Upload Field Image</div>
+              <div style="font-size: 0.9rem; color: #666; margin-top: 10px">
+                Click or drag image for field analysis
+              </div>
+              <input
+                type="file"
+                id="fieldImage"
+                accept="image/*"
+                style="display: none"
+                onchange="handleImageUpload(event)"
+              />
+              <img
+                id="imagePreview"
+                class="image-preview"
+                style="display: none"
+              />
+            </div>
+          </div>
+
+          <button
+            class="btn"
+            onclick="calculateSeeds()"
+            style="width: 100%; margin-top: 20px"
+          >
+            🧮 Calculate Requirements
+          </button>
+        </div>
+
+        <div class="right-panel">
+          <h2 class="section-title">Results & Analysis</h2>
+
+          <div id="results" class="results" style="display: none">
+            <div class="progress-bar">
+              <div id="progressBar" class="progress-fill"></div>
+            </div>
+
+            <div id="seedResults"></div>
+
+            <div id="costResults" style="display: none"></div>
+
+            <div id="plantingCalendar"></div>
+          </div>
+
+          <div id="cropInfo" class="crop-info" style="display: none">
+            <h3>🌾 Crop Information</h3>
+            <div id="cropDetails"></div>
+          </div>
+
+          <div id="recommendations" style="display: none; margin-top: 20px">
+            <h3 style="color: #2c3e50; margin-bottom: 15px">
+              💡 Smart Recommendations
+            </h3>
+            <div id="recommendationsList"></div>
+          </div>
+
+          <div id="imageAnalysis" style="display: none; margin-top: 20px">
+            <h3 style="color: #2c3e50; margin-bottom: 15px">
+              🔍 Field Analysis
+            </h3>
+            <div id="analysisResults"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const cropData = {
+        wheat: {
+          name: "Wheat",
+          seedsPerKg: 35000,
+          optimalDensity: 300,
+          plantingDepth: "2-3 cm",
+          germination: "7-10 days",
+          maturity: "90-120 days",
+          soilTemp: "4-24°C",
+          plantingMonths: [3, 4, 9, 10, 11],
+          idealSoil: ["loam", "clay"],
+          tips: "Plant when soil temperature is consistently above 4°C. Avoid waterlogged conditions.",
+        },
+        corn: {
+          name: "Corn/Maize",
+          seedsPerKg: 3500,
+          optimalDensity: 75000,
+          plantingDepth: "3-5 cm",
+          germination: "5-10 days",
+          maturity: "60-100 days",
+          soilTemp: "10-35°C",
+          plantingMonths: [4, 5, 6],
+          idealSoil: ["loam", "silt"],
+          tips: "Requires warm soil. Plant after last frost date. Ensure good drainage.",
+        },
+        rice: {
+          name: "Rice",
+          seedsPerKg: 20000,
+          optimalDensity: 150,
+          plantingDepth: "1-2 cm",
+          germination: "3-7 days",
+          maturity: "90-150 days",
+          soilTemp: "20-35°C",
+          plantingMonths: [5, 6, 7],
+          idealSoil: ["clay", "silt"],
+          tips: "Requires flooded conditions. Maintain water level 5-10cm above soil.",
+        },
+        soybeans: {
+          name: "Soybeans",
+          seedsPerKg: 6000,
+          optimalDensity: 400000,
+          plantingDepth: "2-4 cm",
+          germination: "4-6 days",
+          maturity: "75-120 days",
+          soilTemp: "15-30°C",
+          plantingMonths: [4, 5, 6],
+          idealSoil: ["loam", "silt"],
+          tips: "Inoculate seeds with rhizobia. Plant when soil is warm and well-drained.",
+        },
+        tomato: {
+          name: "Tomato",
+          seedsPerKg: 350000,
+          optimalDensity: 25000,
+          plantingDepth: "0.5-1 cm",
+          germination: "5-10 days",
+          maturity: "60-85 days",
+          soilTemp: "18-29°C",
+          plantingMonths: [3, 4, 5, 8, 9],
+          idealSoil: ["loam", "sandy"],
+          tips: "Start indoors 6-8 weeks before transplanting. Requires support structures.",
+        },
+        potato: {
+          name: "Potato",
+          seedsPerKg: 40,
+          optimalDensity: 40000,
+          plantingDepth: "10-15 cm",
+          germination: "14-21 days",
+          maturity: "70-120 days",
+          soilTemp: "7-24°C",
+          plantingMonths: [2, 3, 4, 8, 9],
+          idealSoil: ["sandy", "loam"],
+          tips: "Use certified seed potatoes. Hill soil around plants as they grow.",
+        },
+      };
+
+      function showTab(tabName) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((tab) => tab.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((content) => content.classList.remove("active"));
+
+        event.target.classList.add("active");
+        document.getElementById(tabName + "-tab").classList.add("active");
+      }
+
+      function updateCropInfo() {
+        const cropType = document.getElementById("cropType").value;
+        const cropInfoDiv = document.getElementById("cropInfo");
+        const cropDetailsDiv = document.getElementById("cropDetails");
+
+        if (cropType && cropData[cropType]) {
+          const crop = cropData[cropType];
+          document.getElementById("seedDensity").value = crop.optimalDensity;
+
+          cropDetailsDiv.innerHTML = `
+                    <p><strong>Optimal Density:</strong> ${crop.optimalDensity.toLocaleString()} seeds/hectare</p>
+                    <p><strong>Planting Depth:</strong> ${
+                      crop.plantingDepth
+                    }</p>
+                    <p><strong>Germination Time:</strong> ${
+                      crop.germination
+                    }</p>
+                    <p><strong>Maturity:</strong> ${crop.maturity}</p>
+                    <p><strong>Soil Temperature:</strong> ${crop.soilTemp}</p>
+                    <p><strong>Growing Tips:</strong> ${crop.tips}</p>
+                `;
+
+          updatePlantingCalendar(crop.plantingMonths);
+          cropInfoDiv.style.display = "block";
+        } else {
+          cropInfoDiv.style.display = "none";
+        }
+      }
+
+      function updatePlantingCalendar(plantingMonths) {
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const calendarDiv = document.getElementById("plantingCalendar");
+
+        let calendarHTML =
+          '<h4 style="margin-bottom: 15px;">📅 Optimal Planting Calendar</h4><div class="planting-calendar">';
+
+        months.forEach((month, index) => {
+          const monthNum = index + 1;
+          let className = "month-card";
+
+          if (plantingMonths.includes(monthNum)) {
+            className += " ideal";
+          } else if (plantingMonths.some((m) => Math.abs(m - monthNum) <= 1)) {
+            className += " possible";
+          }
+
+          calendarHTML += `<div class="${className}">${month}</div>`;
+        });
+
+        calendarHTML += "</div>";
+        calendarDiv.innerHTML = calendarHTML;
+      }
+
+      function convertArea(area, fromUnit) {
+        const conversionRates = {
+          acres: 4046.86, // to sq meters
+          hectares: 10000, // to sq meters
+          sqft: 0.092903, // to sq meters
+          sqm: 1, // already in sq meters
+        };
+
+        return area * conversionRates[fromUnit];
+      }
+
+      function calculateSeeds() {
+        const cropType = document.getElementById("cropType").value;
+        const fieldArea = parseFloat(
+          document.getElementById("fieldArea").value
+        );
+        const areaUnit = document.getElementById("areaUnit").value;
+        const seedDensity = parseFloat(
+          document.getElementById("seedDensity").value
+        );
+        const germinationRate =
+          parseFloat(document.getElementById("germinationRate").value) || 85;
+        const survivalRate =
+          parseFloat(document.getElementById("survivalRate").value) || 90;
+        const wasteBuffer =
+          parseFloat(document.getElementById("wasteBuffer").value) || 10;
+        const seedPrice =
+          parseFloat(document.getElementById("seedPrice").value) || 0;
+
+        if (!cropType || !fieldArea || !seedDensity) {
+          alert(
+            "Please fill in all required fields: Crop Type, Field Area, and Seed Density"
+          );
+          return;
+        }
+
+        // Convert area to square meters
+        const areaInSqM = convertArea(fieldArea, areaUnit);
+
+        // Calculate basic seed requirements
+        let totalSeeds = areaInSqM * seedDensity;
+
+        // Apply germination and survival rates
+        const adjustmentFactor = (100 / germinationRate) * (100 / survivalRate);
+        totalSeeds = totalSeeds * adjustmentFactor;
+
+        // Add waste buffer
+        totalSeeds = totalSeeds * (1 + wasteBuffer / 100);
+
+        // Calculate weight needed
+        const crop = cropData[cropType];
+        const seedWeight = totalSeeds / crop.seedsPerKg;
+
+        // Calculate cost
+        const totalCost = seedWeight * seedPrice;
+
+        // Display results with animation
+        showResults(
+          totalSeeds,
+          seedWeight,
+          totalCost,
+          areaInSqM,
+          fieldArea,
+          areaUnit
+        );
+        generateRecommendations(cropType, areaInSqM, seedDensity);
+      }
+
+      function showResults(
+        totalSeeds,
+        seedWeight,
+        totalCost,
+        areaInSqM,
+        originalArea,
+        unit
+      ) {
+        const resultsDiv = document.getElementById("results");
+        const seedResultsDiv = document.getElementById("seedResults");
+        const costResultsDiv = document.getElementById("costResults");
+        const progressBar = document.getElementById("progressBar");
+        const currency = document.getElementById("currency").value;
+
+        const currencySymbols = {
+          USD: "$",
+          EUR: "€",
+          GBP: "£",
+          INR: "₹",
+          CAD: "C$",
+        };
+        const symbol = currencySymbols[currency] || "$";
+
+        // Animate progress bar
+        progressBar.style.width = "0%";
+        setTimeout(() => {
+          progressBar.style.width = "100%";
+        }, 100);
+
+        seedResultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">🌱 Total Seeds Required</span>
+                    <span class="result-value">${Math.ceil(
+                      totalSeeds
+                    ).toLocaleString()}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">⚖️ Seed Weight</span>
+                    <span class="result-value">${seedWeight.toFixed(
+                      2
+                    )} kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">📏 Field Area</span>
+                    <span class="result-value">${originalArea} ${unit} (${areaInSqM.toFixed(
+          2
+        )} m²)</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">📊 Planting Density</span>
+                    <span class="result-value">${(
+                      totalSeeds / areaInSqM
+                    ).toFixed(0)} seeds/m²</span>
+                </div>
+            `;
+
+        if (totalCost > 0) {
+          costResultsDiv.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">💰 Estimated Seed Cost</span>
+                        <span class="result-value">${symbol}${totalCost.toFixed(
+            2
+          )}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">💸 Cost per Hectare</span>
+                        <span class="result-value">${symbol}${(
+            totalCost /
+            (areaInSqM / 10000)
+          ).toFixed(2)}</span>
+                    </div>
+                `;
+          costResultsDiv.style.display = "block";
+        } else {
+          costResultsDiv.style.display = "none";
+        }
+
+        resultsDiv.style.display = "block";
+        resultsDiv.scrollIntoView({ behavior: "smooth" });
+      }
+
+      function generateRecommendations(cropType, areaInSqM, seedDensity) {
+        const recommendationsDiv = document.getElementById("recommendations");
+        const recommendationsListDiv = document.getElementById(
+          "recommendationsList"
+        );
+        const crop = cropData[cropType];
+        const soilType = document.getElementById("soilType").value;
+        const climate = document.getElementById("climate").value;
+        const plantingMethod = document.getElementById("plantingMethod").value;
+
+        let recommendations = [];
+
+        // Density recommendations
+        if (seedDensity < crop.optimalDensity * 0.8) {
+          recommendations.push({
+            type: "warning",
+            text: "Seed density is below optimal. Consider increasing to improve yield potential.",
+          });
+        } else if (seedDensity > crop.optimalDensity * 1.2) {
+          recommendations.push({
+            type: "caution",
+            text: "Seed density is quite high. This may lead to competition and reduced individual plant vigor.",
+          });
+        } else {
+          recommendations.push({
+            type: "good",
+            text: "Seed density is within optimal range for maximum yield.",
+          });
+        }
+
+        // Soil compatibility
+        if (crop.idealSoil.includes(soilType)) {
+          recommendations.push({
+            type: "good",
+            text: `${soilType} soil is ideal for ${crop.name}. Expected good performance.`,
+          });
+        } else {
+          recommendations.push({
+            type: "info",
+            text: `Consider soil amendments to improve ${soilType} soil for better ${crop.name} growth.`,
+          });
+        }
+
+        // Planting method advice
+        if (
+          plantingMethod === "precision" &&
+          ["corn", "soybeans", "sunflower"].includes(cropType)
+        ) {
+          recommendations.push({
+            type: "good",
+            text: "Precision planting is excellent for this crop type and will optimize spacing.",
+          });
+        } else if (
+          plantingMethod === "broadcast" &&
+          ["wheat", "barley", "oats"].includes(cropType)
+        ) {
+          recommendations.push({
+            type: "good",
+            text: "Broadcast seeding is suitable for this grain crop.",
+          });
+        }
+
+        // Area-based recommendations
+        if (areaInSqM > 100000) {
+          // > 10 hectares
+          recommendations.push({
+            type: "info",
+            text: "Large field detected. Consider GPS-guided equipment for uniform distribution.",
+          });
+        } else if (areaInSqM < 1000) {
+          // < 0.1 hectare
+          recommendations.push({
+            type: "info",
+            text: "Small plot farming. Hand seeding or small equipment recommended.",
+          });
+        }
+
+        // Climate recommendations
+        if (climate === "tropical" && ["wheat", "barley"].includes(cropType)) {
+          recommendations.push({
+            type: "warning",
+            text: "This crop may struggle in tropical climate. Consider heat-resistant varieties.",
+          });
+        }
+
+        let recommendationsHTML = "";
+        recommendations.forEach((rec) => {
+          const icons = {
+            good: "✅",
+            warning: "⚠️",
+            caution: "⚡",
+            info: "ℹ️",
+          };
+
+          const colors = {
+            good: "#4CAF50",
+            warning: "#FF9800",
+            caution: "#F44336",
+            info: "#2196F3",
+          };
+
+          recommendationsHTML += `
+                    <div style="background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; 
+                                border-left: 4px solid ${
+                                  colors[rec.type]
+                                }; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <span style="font-size: 1.2em; margin-right: 8px;">${
+                          icons[rec.type]
+                        }</span>
+                        ${rec.text}
+                    </div>
+                `;
+        });
+
+        recommendationsListDiv.innerHTML = recommendationsHTML;
+        recommendationsDiv.style.display = "block";
+      }
+
+      function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const preview = document.getElementById("imagePreview");
+            preview.src = e.target.result;
+            preview.style.display = "block";
+
+            // Simulate image analysis
+            analyzeFieldImage(e.target.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function analyzeFieldImage(imageSrc) {
+        const analysisDiv = document.getElementById("imageAnalysis");
+        const resultsDiv = document.getElementById("analysisResults");
+
+        // Simulate analysis with random but realistic results
+        setTimeout(() => {
+          const mockAnalysis = {
+            fieldHealth: Math.floor(Math.random() * 30) + 70, // 70-100%
+            soilMoisture: Math.floor(Math.random() * 40) + 30, // 30-70%
+            weedDensity: Math.floor(Math.random() * 25) + 5, // 5-30%
+            plantCount: Math.floor(Math.random() * 1000) + 500, // 500-1500
+            uniformity: Math.floor(Math.random() * 20) + 80, // 80-100%
+          };
+
+          resultsDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2em; color: #4CAF50;">🌿</div>
+                            <div style="font-weight: bold; margin: 8px 0;">Field Health</div>
+                            <div style="font-size: 1.5em; color: #4CAF50;">${
+                              mockAnalysis.fieldHealth
+                            }%</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2em; color: #2196F3;">💧</div>
+                            <div style="font-weight: bold; margin: 8px 0;">Soil Moisture</div>
+                            <div style="font-size: 1.5em; color: #2196F3;">${
+                              mockAnalysis.soilMoisture
+                            }%</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2em; color: #FF9800;">🌾</div>
+                            <div style="font-weight: bold; margin: 8px 0;">Weed Density</div>
+                            <div style="font-size: 1.5em; color: ${
+                              mockAnalysis.weedDensity > 20
+                                ? "#F44336"
+                                : "#FF9800"
+                            };">${mockAnalysis.weedDensity}%</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2em; color: #9C27B0;">📊</div>
+                            <div style="font-weight: bold; margin: 8px 0;">Plant Count</div>
+                            <div style="font-size: 1.5em; color: #9C27B0;">${
+                              mockAnalysis.plantCount
+                            }</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2em; color: #4CAF50;">📏</div>
+                            <div style="font-weight: bold; margin: 8px 0;">Uniformity</div>
+                            <div style="font-size: 1.5em; color: #4CAF50;">${
+                              mockAnalysis.uniformity
+                            }%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 10px;">🔍 Analysis Summary</h4>
+                        <p style="margin-bottom: 8px;"><strong>Field Condition:</strong> ${
+                          mockAnalysis.fieldHealth > 85
+                            ? "Excellent"
+                            : mockAnalysis.fieldHealth > 70
+                            ? "Good"
+                            : "Fair"
+                        }</p>
+                        <p style="margin-bottom: 8px;"><strong>Irrigation Needs:</strong> ${
+                          mockAnalysis.soilMoisture < 40
+                            ? "High priority"
+                            : mockAnalysis.soilMoisture < 60
+                            ? "Monitor closely"
+                            : "Adequate"
+                        }</p>
+                        <p style="margin-bottom: 8px;"><strong>Weed Management:</strong> ${
+                          mockAnalysis.weedDensity > 20
+                            ? "Immediate action required"
+                            : mockAnalysis.weedDensity > 10
+                            ? "Plan treatment"
+                            : "Under control"
+                        }</p>
+                        <p><strong>Overall Score:</strong> <span style="color: #4CAF50; font-weight: bold;">${Math.floor(
+                          (mockAnalysis.fieldHealth +
+                            mockAnalysis.uniformity +
+                            (100 - mockAnalysis.weedDensity)) /
+                            3
+                        )}%</span></p>
+                    </div>
+                `;
+
+          analysisDiv.style.display = "block";
+        }, 2000);
+      }
+
+      // Drag and drop functionality
+      const fileUpload = document.querySelector(".file-upload");
+
+      fileUpload.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        fileUpload.classList.add("dragover");
+      });
+
+      fileUpload.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        fileUpload.classList.remove("dragover");
+      });
+
+      fileUpload.addEventListener("drop", (e) => {
+        e.preventDefault();
+        fileUpload.classList.remove("dragover");
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith("image/")) {
+          document.getElementById("fieldImage").files = files;
+          handleImageUpload({ target: { files: files } });
+        }
+      });
+
+      // Auto-save functionality using memory (not localStorage due to restrictions)
+      let savedData = {};
+
+      function saveFormData() {
+        savedData = {
+          cropType: document.getElementById("cropType").value,
+          fieldArea: document.getElementById("fieldArea").value,
+          areaUnit: document.getElementById("areaUnit").value,
+          seedDensity: document.getElementById("seedDensity").value,
+          germinationRate: document.getElementById("germinationRate").value,
+          survivalRate: document.getElementById("survivalRate").value,
+          wasteBuffer: document.getElementById("wasteBuffer").value,
+          seedPrice: document.getElementById("seedPrice").value,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      function loadFormData() {
+        if (savedData && savedData.cropType) {
+          Object.keys(savedData).forEach((key) => {
+            if (key !== "timestamp") {
+              const element = document.getElementById(key);
+              if (element) {
+                element.value = savedData[key];
+              }
+            }
+          });
+          updateCropInfo();
+        }
+      }
+
+      // Save form data when inputs change
+      document.addEventListener("change", saveFormData);
+      document.addEventListener("input", saveFormData);
+
+      // Load saved data on page load
+      window.addEventListener("load", loadFormData);
+
+      // Add keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          switch (e.key) {
+            case "Enter":
+              e.preventDefault();
+              calculateSeeds();
+              break;
+            case "1":
+              e.preventDefault();
+              showTab("basic");
+              break;
+            case "2":
+              e.preventDefault();
+              showTab("advanced");
+              break;
+            case "3":
+              e.preventDefault();
+              showTab("analysis");
+              break;
+          }
+        }
+      });
+
+      // Initialize tooltips and help text
+      function addTooltips() {
+        const tooltips = {
+          seedDensity:
+            "Optimal number of seeds to plant per square meter for best yield",
+          germinationRate:
+            "Percentage of seeds expected to successfully sprout",
+          survivalRate:
+            "Percentage of sprouted plants expected to survive to maturity",
+          wasteBuffer:
+            "Extra percentage of seeds to account for handling losses and replanting",
+        };
+
+        Object.keys(tooltips).forEach((id) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.title = tooltips[id];
+          }
+        });
+      }
+
+      // Initialize the application
+      window.addEventListener("load", () => {
+        addTooltips();
+        console.log("🌱 Seedling Success Calculator loaded successfully!");
+
+        // Show welcome message
+        setTimeout(() => {
+          if (!document.getElementById("cropType").value) {
+            const welcomeMsg = document.createElement("div");
+            welcomeMsg.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; 
+                                    padding: 15px; border-radius: 10px; margin: 20px; text-align: center;
+                                    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3); animation: fadeIn 0.5s ease;">
+                            <h3>🎉 Welcome to Seedling Success!</h3>
+                            <p style="margin-top: 8px;">Start by selecting your crop type to get personalized recommendations</p>
+                            <small style="opacity: 0.9;">💡 Tip: Use Ctrl+Enter to calculate quickly!</small>
+                        </div>
+                    `;
+            document
+              .querySelector(".left-panel")
+              .insertBefore(welcomeMsg, document.querySelector(".tabs"));
+
+            setTimeout(() => {
+              welcomeMsg.style.transition = "all 0.5s ease";
+              welcomeMsg.style.opacity = "0";
+              welcomeMsg.style.transform = "translateY(-20px)";
+              setTimeout(() => welcomeMsg.remove(), 500);
+            }, 5000);
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
